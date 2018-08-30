@@ -1,4 +1,4 @@
-def transformIntoStep(String[] chk_data) {
+def transformIntoStep(String workingDirectory, String[] chk_data) {
     return {
         node {
 		stage(chk_data[0])
@@ -6,13 +6,13 @@ def transformIntoStep(String[] chk_data) {
 			switch(chk_data[1])
 			{
 				case "https":
-					sh "${workspace}/certificate_check.sh -type https -url '${chk_data[2]}' -threshold ${threshold}"
+					sh "${workingDirectory}/certificate_check.sh -type https -url '${chk_data[2]}' -threshold ${threshold}"
 					break
 				case "static":
-					sh "${workspace}/certificate_check.sh -type static -data '${chk_data[2]}' -threshold ${threshold}"
+					sh "${workingDirectory}/certificate_check.sh -type static -data '${chk_data[2]}' -threshold ${threshold}"
 					break
 				case "jar":
-					sh "${workspace}/certificate_check.sh -type jar -url '${chk_data[2]}' -threshold ${threshold}"
+					sh "${workingDirectory}/certificate_check.sh -type jar -url '${chk_data[2]}' -threshold ${threshold}"
 				default:
 					throw new Exception("Unknown command type '${chk_data[1]}'")
 			}
@@ -42,7 +42,7 @@ def processFile (String fileName, String threshold) {
 				}
 				chk_data = cmd.split(";")
 
-				stepsForParallel["${chk_data[0]}"] = transformIntoStep(chk_data);
+				stepsForParallel["${chk_data[0]}"] = transformIntoStep("${workspace}", chk_data);
 			}
 			parallel stepsForParallel
 		}
