@@ -92,7 +92,8 @@ function check_date
 function check_https
 	{
 		echo "Checking certificate from domain ${1}"
-		output=$(echo | openssl s_client -connect ${1} 2>/dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl x509 -noout -subject -dates 2>/dev/null)
+		SERVERNAME=`echo ${1} | awk -F':' '{ print $1 }'`
+		output=$(echo | openssl s_client -servername ${SERVERNAME} -connect ${1} 2>/dev/null | sed -ne '/-BEGIN CERTIFICATE-/,/-END CERTIFICATE-/p' | openssl x509 -noout -subject -dates 2>/dev/null)
 
 		if [ "$?" -ne 0 ]; then
 			echo "ERROR: Connection failed!"
